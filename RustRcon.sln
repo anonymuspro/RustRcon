@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RustRcon", "RustRcon.csproj", "{FAA71B79-CF50-4D37-8808-F44504345D57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAA71B79-CF50-4D37-8808-F44504345D57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAA71B79-CF50-4D37-8808-F44504345D57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAA71B79-CF50-4D37-8808-F44504345D57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAA71B79-CF50-4D37-8808-F44504345D57}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {91EFCAC3-C261-423F-92AA-7C075BBEF156}
+	EndGlobalSection
+EndGlobal
