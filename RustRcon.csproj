@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <Authors>dexsper</Authors>
+    <Description>Remote game server control</Description>
+    <PackageProjectUrl>https://github.com/anonymuspro/RustRcon</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/anonymuspro/RustRcon</RepositoryUrl>
+    <PackageTags>rust;rcon</PackageTags>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageId>RustRcon_Client</PackageId>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
