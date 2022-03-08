@@ -26,7 +26,7 @@ RustRcon is available on the NuGet Gallery, as still a release version:
 
 You can add RustRcon to your project with the NuGet Package Manager, by using the following command in the Package Manager Console.
 ~~~ 
-PM> Install-Package RustRcon_Client -Version 1.0.0 
+PM> Install-Package RustRcon_Client 
 ~~~
 
 ## Usage
