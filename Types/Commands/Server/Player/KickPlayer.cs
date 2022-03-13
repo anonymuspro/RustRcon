@@ -13,5 +13,10 @@ namespace RustRcon.Types.Commands.Server
         public KickPlayer(string steamId, string reason = "") : base($"kick {steamId} {reason}")
         {
         }
+
+        public override void Dispose()
+        {
+            
+        }
     }
 }

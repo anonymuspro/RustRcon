@@ -11,5 +11,10 @@ namespace RustRcon.Types.Commands.Server
         public KillPlayer(string steamID) : base($"killplayer {steamID}")
         {
         }
+
+        public override void Dispose()
+        {
+            
+        }
     }
 }

@@ -8,7 +8,7 @@ using WebSocketSharp;
 
 namespace RustRcon
 {
-    public class RconClient
+    public class RconClient : IDisposable
     {
         private string _host;
         private int _port;
@@ -61,7 +61,7 @@ namespace RustRcon
         {
             try
             {
-                _client.Connect();  
+                _client.Connect();
             }
             catch (Exception ex)
             { }
@@ -69,7 +69,7 @@ namespace RustRcon
 
         public void SendCommand(BaseCommand command)
         {
-            if(command == null)
+            if (command == null)
                 throw new ArgumentNullException(nameof(command));
 
             string json = JsonConvert.SerializeObject(command);
@@ -88,12 +88,14 @@ namespace RustRcon
             if (response == null) return;
 
             var command = _commands.Find(x => x.ID == response.ID);
-            
-            if(command != null)
+
+            if (command != null)
             {
                 if (command.Completed) return;
 
                 command.Complete(response);
+                command.Dispose();
+                _commands.Remove(command);
                 return;
             }
 
@@ -110,7 +112,7 @@ namespace RustRcon
                             break;
                         }
                     default:
-                        if(response.Type == "Chat")
+                        if (response.Type == "Chat")
                         {
                             var msg = JsonConvert.DeserializeObject<ChatMsg>(response.Content);
                             OnChatMessage?.Invoke(msg);
@@ -145,6 +147,20 @@ namespace RustRcon
         private void OnClose(object sender, CloseEventArgs e)
         {
             OnConnectionChanged?.Invoke(false);
+        }
+
+        public void Dispose()
+        {
+            if (IsConnected)
+            {
+                _client.Close();
+            }
+
+            OnChatMessage = null;
+            OnConsoleMessage = null;
+            OnConnectionChanged = null;
+
+            _commands = null;
         }
 
         public bool IsConnected

@@ -8,5 +8,10 @@ namespace RustRcon.Types.Commands.Oxide
         public LoadPlugin(string pluginName) : base($"o.unload {pluginName}")
         {
         }
+
+        public override void Dispose()
+        {
+            
+        }
     }
 }

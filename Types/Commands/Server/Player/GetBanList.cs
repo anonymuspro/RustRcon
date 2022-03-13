@@ -67,5 +67,10 @@ namespace RustRcon.Types.Commands.Server
 
             _callback?.Invoke(bannedPlayes);
         }
+
+        public override void Dispose()
+        {
+            _callback = null;
+        }
     }
 }

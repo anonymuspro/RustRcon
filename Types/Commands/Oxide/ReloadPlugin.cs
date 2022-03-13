@@ -7,5 +7,10 @@ namespace RustRcon.Types.Commands.Oxide
         public ReloadPlugin(string pluginName) : base($"o.reload {pluginName}")
         {
         }
+
+        public override void Dispose()
+        {
+            
+        }
     }
 }

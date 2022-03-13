@@ -1,8 +1,9 @@
 ﻿using RustRcon.Types.Response;
+using System;
 
 namespace RustRcon.Types.Commands.Base
 {
-    public abstract class BaseCommand : BasePackage
+    public abstract class BaseCommand : BasePackage, IDisposable
     {
         /// <summary>
         /// Indicates whether the response has arrived
@@ -24,6 +25,9 @@ namespace RustRcon.Types.Commands.Base
 
             Completed = true;
         }
+
+        public abstract void Dispose();
+
 
         /// <summary>
         /// The base class of the server command.

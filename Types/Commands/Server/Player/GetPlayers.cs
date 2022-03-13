@@ -38,5 +38,10 @@ namespace RustRcon.Types.Commands.Server
             _callback?.Invoke(players);
 
         }
+
+        public override void Dispose()
+        {
+            _callback = null;
+        }
     }
 }

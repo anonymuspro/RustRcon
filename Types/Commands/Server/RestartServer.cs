@@ -12,5 +12,10 @@ namespace RustRcon.Types.Commands.Server
         {
 
         }
+
+        public override void Dispose()
+        {
+            
+        }
     }
 }

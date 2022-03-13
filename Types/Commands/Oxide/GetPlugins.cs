@@ -75,5 +75,10 @@ namespace RustRcon.Types.Commands.Oxide
 
             }
         }
+
+        public override void Dispose()
+        {
+            _callback = null;
+        }
     }
 }

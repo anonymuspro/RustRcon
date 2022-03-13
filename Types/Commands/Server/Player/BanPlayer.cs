@@ -13,5 +13,10 @@ namespace RustRcon.Types.Commands.Server
         public BanPlayer(string steamId, string reason = "") : base($"ban {steamId} {reason}")
         {
         }
+
+        public override void Dispose()
+        {
+            
+        }
     }
 }
