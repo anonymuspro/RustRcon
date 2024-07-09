@@ -1,4 +1,4 @@
-﻿namespace RustRcon.Types.Response
+﻿namespace RustRcon.Types.Response.Server
 {
     public class ServerInfo
     {

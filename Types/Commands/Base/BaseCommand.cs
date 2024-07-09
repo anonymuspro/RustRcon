@@ -1,5 +1,6 @@
 ﻿using RustRcon.Pooling;
 using RustRcon.Types.Response;
+using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Base
 {

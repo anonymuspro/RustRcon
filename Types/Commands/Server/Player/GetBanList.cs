@@ -1,12 +1,13 @@
-﻿using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Response;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using RustRcon.Pooling;
+using RustRcon.Types.Commands.Base;
+using RustRcon.Types.Response.Server;
+using RustRcon.Types.Server;
 
-namespace RustRcon.Types.Commands.Server
+namespace RustRcon.Types.Commands.Server.Player
 {
     public class GetBanList : BaseCommand
     {

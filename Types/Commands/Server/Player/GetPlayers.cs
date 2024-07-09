@@ -1,22 +1,21 @@
-﻿using Newtonsoft.Json;
-using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Response;
-using RustRcon.Types.Server;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using RustRcon.Pooling;
+using RustRcon.Types.Commands.Base;
+using RustRcon.Types.Response.Server;
 
-namespace RustRcon.Types.Commands.Server
+namespace RustRcon.Types.Commands.Server.Player
 {
     public class GetPlayers : BaseCommand
     {
-        private Action<List<Player>> _callback;
+        private Action<List<Types.Server.Player>> _callback;
 
         /// <summary>
         /// Get players command
         /// </summary>
         /// <param name="callback">A response containing a list of players is called after receiving a response from the server</param>
-        public static GetPlayers Create(Action<List<Player>> callback)
+        public static GetPlayers Create(Action<List<Types.Server.Player>> callback)
         {
             var command = CreatePackage<GetPlayers>();
             command._callback = callback;
@@ -29,11 +28,11 @@ namespace RustRcon.Types.Commands.Server
         {
             base.Complete(response);
 
-            List<Player> players = RustRconPool.GetList<Player>();
+            List<Types.Server.Player> players = RustRconPool.GetList<Types.Server.Player>();
 
             try
             {
-                players = JsonConvert.DeserializeObject<List<Player>>(response.Content);
+                players = JsonConvert.DeserializeObject<List<Types.Server.Player>>(response.Content);
             }
             catch (Exception)
             {

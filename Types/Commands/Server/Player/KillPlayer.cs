@@ -1,6 +1,6 @@
 ﻿using RustRcon.Types.Commands.Base;
 
-namespace RustRcon.Types.Commands.Server
+namespace RustRcon.Types.Commands.Server.Player
 {
     public class KillPlayer : BaseCommand
     {

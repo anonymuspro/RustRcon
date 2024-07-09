@@ -1,4 +1,4 @@
-﻿namespace RustRcon.Types.Commands.Server
+﻿namespace RustRcon.Types.Server
 {
     public class BannedPlayer
     {

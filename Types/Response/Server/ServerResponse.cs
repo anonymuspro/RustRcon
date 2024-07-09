@@ -2,7 +2,7 @@
 using RustRcon.Pooling;
 using RustRcon.Types.Commands.Base;
 
-namespace RustRcon.Types.Response
+namespace RustRcon.Types.Response.Server
 {
     public class ServerResponse : BasePackage
     {

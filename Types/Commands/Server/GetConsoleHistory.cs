@@ -5,6 +5,7 @@ using RustRcon.Types.Server.Messages;
 using System;
 using System.Collections.Generic;
 using RustRcon.Pooling;
+using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server
 {

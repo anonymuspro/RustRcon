@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using RustRcon.Pooling;
+using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Oxide
 {

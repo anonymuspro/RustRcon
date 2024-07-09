@@ -4,6 +4,7 @@ using RustRcon.Types.Response;
 using RustRcon.Types.Server.Messages;
 using System;
 using System.Collections.Generic;
+using RustRcon.Types.Response.Server;
 using WebSocketSharp;
 
 namespace RustRcon

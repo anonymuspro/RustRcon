@@ -1,6 +1,7 @@
 ﻿using RustRcon.Types.Commands.Base;
 using RustRcon.Types.Response;
 using System;
+using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server
 {
