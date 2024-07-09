@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <Authors>dexsper</Authors>
     <Description>Remote game server control</Description>
     <PackageProjectUrl>https://github.com/anonymuspro/RustRcon</PackageProjectUrl>
@@ -13,9 +12,11 @@
     <Version>1.0.2</Version>
     <AssemblyVersion>1.0.2</AssemblyVersion>
     <FileVersion>1.0.2</FileVersion>
+    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
   </ItemGroup>

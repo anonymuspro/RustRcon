@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using RustRcon.Pooling;
 
 namespace RustRcon.Types.Commands.Oxide
 {
@@ -16,19 +17,24 @@ namespace RustRcon.Types.Commands.Oxide
         /// Returns a list of installed plugins (if there is an oxide mod)
         /// </summary>
         /// <param name="callback"></param>
-        public GetPlugins(Action<List<Plugin>> callback = null) : base("o.plugins")
+        public static GetPlugins Create(Action<List<Plugin>> callback = null)
         {
-            _callback = callback;
+            var command = CreatePackage<GetPlugins>();
+            command._callback = callback;
+            command.Content = "o.plugins";
+
+            return command;
         }
 
         public override void Complete(ServerResponse response)
         {
             base.Complete(response);
-            List<Plugin> pluginList = new List<Plugin>();
+            List<Plugin> pluginList = RustRconPool.GetList<Plugin>();
 
             if (string.IsNullOrEmpty(response.Content) || response.Content.StartsWith("Listing") == false)
             {
-                _callback?.Invoke(pluginList); 
+                _callback?.Invoke(pluginList);
+                RustRconPool.FreeList(pluginList);
                 return;
             }
 
@@ -36,15 +42,15 @@ namespace RustRcon.Types.Commands.Oxide
             {
                 List<string> plugins = response.Content.Split('\n').ToList();
 
-
                 foreach (var plugin in plugins.Skip(1))
                 {
-                    string name = "";
-                    bool loaded = true;
+                    string name;
+                    bool loaded;
                     string version = "";
                     string author = "";
 
-                    Match m1 = Regex.Match(plugin, "[0-9]+\\s\"(.*)\"\\s\\(([0-9]+.[0-9]+.[0-9]+)\\)\\sby\\s(.*?)\\s\\((.*?)\\)\\s-\\s(.*)");
+                    Match m1 = Regex.Match(plugin,
+                        "[0-9]+\\s\"(.*)\"\\s\\(([0-9]+.[0-9]+.[0-9]+)\\)\\sby\\s(.*?)\\s\\((.*?)\\)\\s-\\s(.*)");
 
                     if (m1.Success == false)
                     {
@@ -69,15 +75,18 @@ namespace RustRcon.Types.Commands.Oxide
                 }
 
                 _callback?.Invoke(pluginList);
+                RustRconPool.FreeList(pluginList);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
+                // ignored
             }
         }
 
-        public override void Dispose()
+        protected override void EnterPool()
         {
+            base.EnterPool();
+
             _callback = null;
         }
     }

@@ -10,11 +10,12 @@ namespace RustRcon
 {
     public class RconClient : IDisposable
     {
-        private string _host;
-        private int _port;
-        private string _password;
+        private readonly string _host;
+        private readonly int _port;
+        private readonly string _password;
 
-        private WebSocket _client;
+        private readonly WebSocket _client;
+        private readonly Dictionary<Int32, BaseCommand> _commands;
 
         /// <summary>
         /// Called when a new console message is received from the server.
@@ -31,7 +32,7 @@ namespace RustRcon
         /// </summary>
         public event Action<bool> OnConnectionChanged;
 
-        private List<BaseCommand> _commands;
+        public bool IsConnected => _client.IsAlive;
 
         /// <summary>
         /// Initialise new remote connection to a specified server.
@@ -53,8 +54,7 @@ namespace RustRcon
             _client.OnError += OnError;
             _client.OnMessage += OnMessage;
             _client.OnOpen += OnOpen;
-
-            _commands = new List<BaseCommand>();
+            _commands = new Dictionary<int, BaseCommand>();
         }
 
         public void Connect()
@@ -64,7 +64,9 @@ namespace RustRcon
                 _client.Connect();
             }
             catch (Exception ex)
-            { }
+            {
+                // ignored
+            }
         }
 
         public void SendCommand(BaseCommand command)
@@ -75,8 +77,7 @@ namespace RustRcon
             string json = JsonConvert.SerializeObject(command);
 
             _client.Send(json);
-
-            _commands.Add(command);
+            _commands.Add(command.Id, command);
         }
 
         private void OnMessage(object sender, MessageEventArgs e)
@@ -84,18 +85,22 @@ namespace RustRcon
             if (string.IsNullOrEmpty(e.Data)) return;
 
             var response = JsonConvert.DeserializeObject<ServerResponse>(e.Data);
+            if (response == null)
+                return;
 
-            if (response == null) return;
-
-            var command = _commands.Find(x => x.ID == response.ID);
-
-            if (command != null)
+            if (_commands.TryGetValue(response.Id, out BaseCommand command))
             {
-                if (command.Completed) return;
+                if (command.Completed)
+                {
+                    if (!command.Disposed)
+                        command.Dispose();
+                    return;
+                }
 
                 command.Complete(response);
+                _commands.Remove(command.Id);
+
                 command.Dispose();
-                _commands.Remove(command);
                 return;
             }
 
@@ -104,25 +109,29 @@ namespace RustRcon
                 if (response.Content.StartsWith("[rcon]"))
                     return;
 
-                switch (response.ID)
+                switch (response.Id)
                 {
                     case 0:
-                        {
-                            OnConsoleMessage?.Invoke(new ConsoleMsg(response.Content, response.Type.ToEnum<ConsoleMsg.MessageType>()));
-                            break;
-                        }
+                    {
+                        OnConsoleMessage?.Invoke(new ConsoleMsg(response.Content,
+                            response.Type.ToEnum<ConsoleMsg.MessageType>()));
+                        break;
+                    }
                     default:
+                    {
                         if (response.Type == "Chat")
                         {
                             var msg = JsonConvert.DeserializeObject<ChatMsg>(response.Content);
                             OnChatMessage?.Invoke(msg);
                         }
+
                         break;
+                    }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
+                // ignored
             }
         }
 
@@ -140,7 +149,7 @@ namespace RustRcon
             }
             catch
             {
-
+                // ignored
             }
         }
 
@@ -159,16 +168,6 @@ namespace RustRcon
             OnChatMessage = null;
             OnConsoleMessage = null;
             OnConnectionChanged = null;
-
-            _commands = null;
-        }
-
-        public bool IsConnected
-        {
-            get
-            {
-                return _client.IsAlive;
-            }
         }
     }
 }

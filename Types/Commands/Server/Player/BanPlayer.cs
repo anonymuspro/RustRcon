@@ -1,7 +1,6 @@
 ﻿using RustRcon.Types.Commands.Base;
 
 namespace RustRcon.Types.Commands.Server
-
 {
     public class BanPlayer : BaseCommand
     {
@@ -9,14 +8,13 @@ namespace RustRcon.Types.Commands.Server
         /// Blocks a player on the server
         /// </summary>
         /// <param name="steamId">User steam ID</param>
-        /// <param name="reason">Reason of ban</param>
-        public BanPlayer(string steamId, string reason = "") : base($"ban {steamId} {reason}")
+        /// <param name="reason">Reason of ban</param>   
+        public static BanPlayer Create(string steamId, string reason = "")
         {
-        }
+            var command = CreatePackage<BanPlayer>();
+            command.Content = $"ban {steamId} {reason}";
 
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }

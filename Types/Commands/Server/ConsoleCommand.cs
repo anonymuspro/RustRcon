@@ -6,16 +6,19 @@ namespace RustRcon.Types.Commands.Server
 {
     public class ConsoleCommand : BaseCommand
     {
-        private event Action<ServerResponse> _callback;
+        private Action<ServerResponse> _callback;
 
-        /// <summary>
         /// Run command on the server console
         /// </summary>
         /// <param name="message">Console command</param>
         /// <param name="callback">A response containing a message from the server</param>
-        public ConsoleCommand(string message, Action<ServerResponse> callback = null) : base(message)
+        public static ConsoleCommand Create(Action<ServerResponse> callback, string message)
         {
-            this._callback = callback;
+            var command = CreatePackage<ConsoleCommand>();
+            command._callback = callback;
+            command.Content = message;
+
+            return command;
         }
 
         public override void Complete(ServerResponse response)
@@ -25,8 +28,10 @@ namespace RustRcon.Types.Commands.Server
             _callback?.Invoke(response);
         }
 
-        public override void Dispose()
+        protected override void EnterPool()
         {
+            base.EnterPool();
+
             _callback = null;
         }
     }

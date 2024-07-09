@@ -7,15 +7,18 @@ namespace RustRcon.Types.Commands.Server
 {
     public class GetServerInfo : BaseCommand
     {
-        private Action<ServerInfo> _callback;
-
-        /// <summary>
+        private Action<ServerInfo> _callback;   
+        
         /// Return server info
         /// </summary>
         /// <param name="callback">Called when a response is received, contains an instance of the ServerInfo class</param>
-        public GetServerInfo(Action<ServerInfo> callback = null) : base("serverinfo")
+        public static GetServerInfo Create(Action<ServerInfo> callback)
         {
-            _callback = callback;
+            var command =  CreatePackage<GetServerInfo>();
+            command._callback = callback;
+            command.Content = "serverinfo";
+
+            return command;
         }
 
         public override void Complete(ServerResponse response)
@@ -34,8 +37,10 @@ namespace RustRcon.Types.Commands.Server
             }
         }
 
-        public override void Dispose()
+        protected override void EnterPool()
         {
+            base.EnterPool();
+
             _callback = null;
         }
     }

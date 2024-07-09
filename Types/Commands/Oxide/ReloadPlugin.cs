@@ -4,13 +4,12 @@ namespace RustRcon.Types.Commands.Oxide
 {
     public class ReloadPlugin : BaseCommand
     {
-        public ReloadPlugin(string pluginName) : base($"o.reload {pluginName}")
+        public static ReloadPlugin Create(string pluginName)
         {
-        }
+            var command = CreatePackage<ReloadPlugin>();
+            command.Content = $"o.load {pluginName}";
 
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }

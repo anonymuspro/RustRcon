@@ -1,17 +1,15 @@
 ﻿using RustRcon.Types.Commands.Base;
 
-
 namespace RustRcon.Types.Commands.Oxide
 {
     public class LoadPlugin : BaseCommand
     {
-        public LoadPlugin(string pluginName) : base($"o.unload {pluginName}")
+        public static LoadPlugin Create(string pluginName)
         {
-        }
+            var command = CreatePackage<LoadPlugin>();
+            command.Content = $"o.load {pluginName}";
 
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }

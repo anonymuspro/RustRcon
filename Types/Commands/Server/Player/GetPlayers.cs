@@ -4,6 +4,7 @@ using RustRcon.Types.Response;
 using RustRcon.Types.Server;
 using System;
 using System.Collections.Generic;
+using RustRcon.Pooling;
 
 namespace RustRcon.Types.Commands.Server
 {
@@ -15,32 +16,38 @@ namespace RustRcon.Types.Commands.Server
         /// Get players command
         /// </summary>
         /// <param name="callback">A response containing a list of players is called after receiving a response from the server</param>
-        public GetPlayers(Action<List<Player>> callback) : base("playerlist")
+        public static GetPlayers Create(Action<List<Player>> callback)
         {
-            _callback = callback;
+            var command = CreatePackage<GetPlayers>();
+            command._callback = callback;
+            command.Content = "playerlist";
+
+            return command;
         }
 
         public override void Complete(ServerResponse response)
         {
             base.Complete(response);
 
-            List<Player> players = new List<Player>();
+            List<Player> players = RustRconPool.GetList<Player>();
 
             try
             {
                 players = JsonConvert.DeserializeObject<List<Player>>(response.Content);
             }
-            catch
+            catch (Exception)
             {
-
+                // ignored
             }
 
             _callback?.Invoke(players);
-
+            RustRconPool.FreeList(players);
         }
 
-        public override void Dispose()
+        protected override void EnterPool()
         {
+            base.EnterPool();
+            
             _callback = null;
         }
     }

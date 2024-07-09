@@ -1,9 +1,9 @@
-﻿using RustRcon.Types.Response;
-using System;
+﻿using RustRcon.Pooling;
+using RustRcon.Types.Response;
 
 namespace RustRcon.Types.Commands.Base
 {
-    public abstract class BaseCommand : BasePackage, IDisposable
+    public abstract class BaseCommand : BasePackage
     {
         /// <summary>
         /// Indicates whether the response has arrived
@@ -13,7 +13,7 @@ namespace RustRcon.Types.Commands.Base
         /// <summary>
         /// Required for the server to accept the command
         /// </summary>
-        public string Name { get { return "WebRcon";  } }
+        public string Name => "WebRcon";
 
         /// <summary>
         /// Gives an answer to the command and completes its call
@@ -26,15 +26,11 @@ namespace RustRcon.Types.Commands.Base
             Completed = true;
         }
 
-        public abstract void Dispose();
-
-
-        /// <summary>
-        /// The base class of the server command.
-        /// </summary>
-        public BaseCommand(string message) : base(message)
+        protected override void EnterPool()
         {
+            base.EnterPool();
 
+            Completed = false;
         }
     }
 }

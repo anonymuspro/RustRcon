@@ -1,44 +1,43 @@
 ﻿using Newtonsoft.Json;
 using System;
+using RustRcon.Pooling;
 
 namespace RustRcon.Types.Commands.Base
 {
-    public abstract class BasePackage
+    public abstract class BasePackage : BasePoolable
     {
+        private static Int32 _idCounter = 2;
+
         /// <summary>
         /// It is necessary to determine the type of package and its call
         /// </summary>
         [JsonProperty("Identifier")]
-        public Int32 ID { get; private set; }
+        public Int32 Id { get; protected set; }
 
         /// <summary>
         /// Package Contents
         /// </summary>
-
         [JsonProperty("Message")]
-        public string Content { get; }
+        public string Content { get; set; }
 
-        private static Int32 id_counter = 2;
-
-        /// <summary>
-        /// A package constructor with the ability to set a custom ID, usually used for packages from the server
-        /// </summary>
-        /// <param name="id">Package ID</param>
-        /// <param name="content">Package content</param>
-        public BasePackage(int id, string content)
+        protected static T CreatePackage<T>() where T : BasePackage, new()
         {
-            this.ID = id;
-            this.Content = content;
+            return RustRconPool.Get<T>();
         }
 
-        /// <summary>
-        /// Constructor for a package without the ability to set a custom ID, usually used for packages from the client
-        /// </summary>
-        /// <param name="content"></param>
-        public BasePackage(string content)
+        protected override void EnterPool()
         {
-            this.ID = ++id_counter;
-            this.Content = content;
+            base.EnterPool();
+
+            Id = 0;
+            Content = string.Empty;
+        }
+
+        protected override void LeavePool()
+        {
+            base.LeavePool();
+
+            Id = ++_idCounter;
         }
     }
 }

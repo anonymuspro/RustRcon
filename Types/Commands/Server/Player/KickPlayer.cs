@@ -10,13 +10,12 @@ namespace RustRcon.Types.Commands.Server
         /// </summary>
         /// <param name="steamId">Player SteamID</param>
         /// <param name="reason">Reason of kick</param>
-        public KickPlayer(string steamId, string reason = "") : base($"kick {steamId} {reason}")
+        public static KickPlayer Create(string steamId, string reason = "")
         {
-        }
+            var command = CreatePackage<KickPlayer>();
+            command.Content = $"kick {steamId} {reason}";
 
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }

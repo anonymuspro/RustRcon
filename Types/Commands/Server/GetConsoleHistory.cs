@@ -4,6 +4,7 @@ using RustRcon.Types.Response;
 using RustRcon.Types.Server.Messages;
 using System;
 using System.Collections.Generic;
+using RustRcon.Pooling;
 
 namespace RustRcon.Types.Commands.Server
 {
@@ -16,31 +17,38 @@ namespace RustRcon.Types.Commands.Server
         /// </summary>
         /// <param name="callback">Called when a response is received</param>
         /// <param name="messagesCount">Maximum number of messages</param>
-        public GetConsoleHistory(Action<List<ConsoleMsg>> callback = null, int messagesCount = 1024) : base($"console.tail {messagesCount}")
+        public static GetConsoleHistory Create(Action<List<ConsoleMsg>> callback, int messagesCount = 1024)
         {
-            _callback = callback;
+            var command = CreatePackage<GetConsoleHistory>();
+            command._callback = callback;
+            command.Content = $"console.tail {messagesCount}";
+
+            return command;
         }
 
         public override void Complete(ServerResponse response)
         {
             base.Complete(response);
 
-            List<ConsoleMsg> messages = new List<ConsoleMsg>();
+            List<ConsoleMsg> messages = RustRconPool.GetList<ConsoleMsg>();
 
             try
-            { 
-                messages = JsonConvert.DeserializeObject<List<ConsoleMsg>>(response.Content); 
-            }
-            catch (Exception ex)
             {
-                
+                messages = JsonConvert.DeserializeObject<List<ConsoleMsg>>(response.Content);
+            }
+            catch (Exception)
+            {
+                // ignored
             }
 
             _callback?.Invoke(messages);
+            RustRconPool.FreeList(messages);
         }
 
-        public override void Dispose()
+        protected override void EnterPool()
         {
+            base.EnterPool();
+
             _callback = null;
         }
     }

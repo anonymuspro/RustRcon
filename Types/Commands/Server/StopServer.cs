@@ -7,14 +7,12 @@ namespace RustRcon.Types.Commands.Server
         /// <summary>
         /// Stop game server
         /// </summary>
-        public StopServer() : base("server.stop")
+        public static StopServer Create()
         {
+            var command =  CreatePackage<StopServer>();
+            command.Content = "server.stop";
 
-        }
-
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }

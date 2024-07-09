@@ -8,14 +8,12 @@ namespace RustRcon.Types.Commands.Server
         /// Restart server 
         /// </summary>
         /// <param name="seconds">time in seconds to restart</param>
-        public RestartServer(int seconds = 1) : base($"restart {seconds}")
+        public static RestartServer Create(int seconds = 1)
         {
+            var command = CreatePackage<RestartServer>();
+            command.Content = $"restart {seconds}";
 
-        }
-
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }

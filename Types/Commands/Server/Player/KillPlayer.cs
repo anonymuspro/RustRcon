@@ -7,14 +7,13 @@ namespace RustRcon.Types.Commands.Server
         /// <summary>
         /// Kill player character
         /// </summary>
-        /// <param name="steamID">Player SteamID</param>
-        public KillPlayer(string steamID) : base($"killplayer {steamID}")
+        /// <param name="steamId">Player SteamID</param>
+        public static KickPlayer Create(string steamId)
         {
-        }
+            var command = CreatePackage<KickPlayer>();
+            command.Content = $"killplayer {steamId}";
 
-        public override void Dispose()
-        {
-            
+            return command;
         }
     }
 }
