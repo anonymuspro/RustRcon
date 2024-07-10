@@ -1,7 +1,7 @@
 ﻿namespace RustRcon.Pooling
 {
     /// <summary>
-    /// Represents a pool
+    ///     Represents a pool
     /// </summary>
     public interface IPool
     {

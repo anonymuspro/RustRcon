@@ -4,7 +4,7 @@
     {
         public string SteamID { get; set; }
         public string DisplayName { get; set; }
-        
+
         public string Reason { get; set; }
     }
 }

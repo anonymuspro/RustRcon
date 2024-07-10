@@ -1,21 +1,25 @@
-﻿using System;
+﻿#region
+
+using System;
+
+#endregion
 
 namespace RustRcon.Pooling
 {
     /// <summary>
-    /// Represents a poolable object
+    ///     Represents a poolable object
     /// </summary>
     public abstract class BasePoolable : IDisposable
     {
         internal bool Disposed;
 
         /// <summary>
-        /// Returns if the object should be pooled.
-        /// This field is set to true when leaving the pool.
-        /// If the object instantiated using new() outside the pool it will be false
+        ///     Returns if the object should be pooled.
+        ///     This field is set to true when leaving the pool.
+        ///     If the object instantiated using new() outside the pool it will be false
         /// </summary>
         private bool _shouldPool;
-        private IPool<BasePoolable> _pool;
+        private IPool<BasePoolable> _pool = null!;
 
         internal void OnInit(IPool<BasePoolable> pool)
         {
@@ -37,21 +41,19 @@ namespace RustRcon.Pooling
         }
 
         /// <summary>
-        /// Called when the object is returned to the pool.
-        /// Can be overriden in child classes to cleanup used data
+        ///     Called when the object is returned to the pool.
+        ///     Can be overriden in child classes to cleanup used data
         /// </summary>
         protected virtual void EnterPool()
         {
-
         }
 
         /// <summary>
-        /// Called when the object leaves the pool.
-        /// Can be overriden in child classes to set the initial object state
+        ///     Called when the object leaves the pool.
+        ///     Can be overriden in child classes to set the initial object state
         /// </summary>
         protected virtual void LeavePool()
         {
-
         }
 
         public virtual void Dispose()

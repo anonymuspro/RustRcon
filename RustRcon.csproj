@@ -1,24 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Authors>dexsper</Authors>
-    <Description>Remote game server control</Description>
-    <PackageProjectUrl>https://github.com/anonymuspro/RustRcon</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/anonymuspro/RustRcon</RepositoryUrl>
-    <PackageTags>rust;rcon</PackageTags>
-    <NeutralLanguage>en</NeutralLanguage>
-    <PackageId>RustRcon_Client</PackageId>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
-    <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
-    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Authors>dexsper</Authors>
+        <Description>Remote game server control</Description>
+        <PackageProjectUrl>https://github.com/anonymuspro/RustRcon</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/anonymuspro/RustRcon</RepositoryUrl>
+        <PackageTags>rust;rcon</PackageTags>
+        <NeutralLanguage>en</NeutralLanguage>
+        <PackageId>RustRcon_Client</PackageId>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Version>1.0.2</Version>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
+        <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
+        <Nullable>Enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2024.2.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+    </ItemGroup>
 
 </Project>

@@ -5,22 +5,21 @@ using Newtonsoft.Json;
 using RustRcon.Pooling;
 using RustRcon.Types.Commands.Base;
 using RustRcon.Types.Response.Server;
-using RustRcon.Types.Server.Messages;
+using RustRcon.Types.Server;
 
 #endregion
 
-namespace RustRcon.Types.Commands.Server
+namespace RustRcon.Types.Commands.Server.Entity
 {
-    public class GetConsoleHistory : BaseCommand<PoolableList<ConsoleMsg>>
+    public class GetPlayers : BaseCommand<PoolableList<Player>>
     {
         /// <summary>
-        ///     Return server console messages history
+        ///     Get players command
         /// </summary>
-        /// <param name="messagesCount">Maximum number of messages</param>
-        public static GetConsoleHistory Create(int messagesCount = 1024)
+        public static GetPlayers Create()
         {
-            var command = CreatePackage<GetConsoleHistory>();
-            command.Content = $"console.tail {messagesCount}";
+            var command = CreatePackage<GetPlayers>();
+            command.Content = "playerlist";
 
             return command;
         }
@@ -31,7 +30,7 @@ namespace RustRcon.Types.Commands.Server
 
             try
             {
-                Result = RustRconPool.Get<PoolableList<ConsoleMsg>>();
+                Result = RustRconPool.Get<PoolableList<Player>>();
                 JsonConvert.PopulateObject(response.Content, Result);
             }
             catch (Exception)

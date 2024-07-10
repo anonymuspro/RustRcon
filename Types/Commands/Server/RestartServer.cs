@@ -1,11 +1,16 @@
-﻿using RustRcon.Types.Commands.Base;
+﻿#region
+
+using RustRcon.Types.Commands.Base;
+using RustRcon.Types.Response.Server;
+
+#endregion
 
 namespace RustRcon.Types.Commands.Server
 {
-    public class RestartServer : BaseCommand
+    public class RestartServer : BaseCommand<ServerResponse>
     {
         /// <summary>
-        /// Restart server 
+        ///     Restart server
         /// </summary>
         /// <param name="seconds">time in seconds to restart</param>
         public static RestartServer Create(int seconds = 1)
@@ -14,6 +19,12 @@ namespace RustRcon.Types.Commands.Server
             command.Content = $"restart {seconds}";
 
             return command;
+        }
+
+        public override void Complete(ServerResponse response)
+        {
+            base.Complete(response);
+            Result = response;
         }
     }
 }

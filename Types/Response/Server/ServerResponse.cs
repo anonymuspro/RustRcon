@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿#region
+
+using Newtonsoft.Json;
 using RustRcon.Pooling;
 using RustRcon.Types.Commands.Base;
+
+#endregion
 
 namespace RustRcon.Types.Response.Server
 {

@@ -1,27 +1,26 @@
-﻿using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Oxide;
-using RustRcon.Types.Response;
+﻿#region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using RustRcon.Pooling;
+using RustRcon.Types.Commands.Base;
+using RustRcon.Types.Oxide;
 using RustRcon.Types.Response.Server;
+
+#endregion
 
 namespace RustRcon.Types.Commands.Oxide
 {
-    public class GetPlugins : BaseCommand
+    public class GetPlugins : BaseCommand<PoolableList<Plugin>>
     {
-        private Action<List<Plugin>> _callback;
-
         /// <summary>
-        /// Returns a list of installed plugins (if there is an oxide mod)
+        ///     Returns a list of installed plugins (if there is an oxide mod)
         /// </summary>
-        /// <param name="callback"></param>
-        public static GetPlugins Create(Action<List<Plugin>> callback = null)
+        public static GetPlugins Create()
         {
             var command = CreatePackage<GetPlugins>();
-            command._callback = callback;
             command.Content = "o.plugins";
 
             return command;
@@ -30,14 +29,9 @@ namespace RustRcon.Types.Commands.Oxide
         public override void Complete(ServerResponse response)
         {
             base.Complete(response);
-            List<Plugin> pluginList = RustRconPool.GetList<Plugin>();
 
             if (string.IsNullOrEmpty(response.Content) || response.Content.StartsWith("Listing") == false)
-            {
-                _callback?.Invoke(pluginList);
-                RustRconPool.FreeList(pluginList);
                 return;
-            }
 
             try
             {
@@ -71,24 +65,13 @@ namespace RustRcon.Types.Commands.Oxide
                         author = m1.Groups[3].Value;
                     }
 
-
-                    pluginList.Add(new Plugin(name, loaded, version, author));
+                    Result.Add(new Plugin(name, loaded, version, author));
                 }
-
-                _callback?.Invoke(pluginList);
-                RustRconPool.FreeList(pluginList);
             }
             catch (Exception)
             {
                 // ignored
             }
-        }
-
-        protected override void EnterPool()
-        {
-            base.EnterPool();
-
-            _callback = null;
         }
     }
 }

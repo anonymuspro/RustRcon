@@ -1,17 +1,17 @@
-﻿namespace RustRcon.Types.Server.Messages
+﻿#region
+
+using RustRcon.Pooling;
+
+#endregion
+
+namespace RustRcon.Types.Server.Messages
 {
-    public class ConsoleMsg
+    public class ConsoleMsg : BasePoolable
     {
-        public ConsoleMsg(string message, MessageType type)
-        {
-            Message = message;
-            Type = type;
-        }
+        public string Message { get; set; }
 
-        public string Message { get; private set; }
+        public MessageType Type { get; set; }
 
-        public MessageType Type { get; private set; }
-    
         public enum MessageType
         {
             Generic,
@@ -19,6 +19,13 @@
             Error,
             Warning
         }
-    }
 
+        protected override void EnterPool()
+        {
+            base.EnterPool();
+
+            Message = string.Empty;
+            Type = MessageType.Generic;
+        }
+    }
 }

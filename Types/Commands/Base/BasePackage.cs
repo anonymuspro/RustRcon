@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿#region
+
 using System;
+using Newtonsoft.Json;
 using RustRcon.Pooling;
+
+#endregion
 
 namespace RustRcon.Types.Commands.Base
 {
@@ -9,13 +13,13 @@ namespace RustRcon.Types.Commands.Base
         private static Int32 _idCounter = 2;
 
         /// <summary>
-        /// It is necessary to determine the type of package and its call
+        ///     It is necessary to determine the type of package and its call
         /// </summary>
         [JsonProperty("Identifier")]
         public Int32 Id { get; protected set; }
 
         /// <summary>
-        /// Package Contents
+        ///     Package Contents
         /// </summary>
         [JsonProperty("Message")]
         public string Content { get; set; }

@@ -1,12 +1,16 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
+#endregion
+
 namespace RustRcon.Utility
 {
     /// <summary>
-    /// A dictionary which returns null for non-existant keys and removes keys when setting an index to null.
+    ///     A dictionary which returns null for non-existant keys and removes keys when setting an index to null.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,20 +9,18 @@ using RustRcon.Types.Commands.Base;
 using RustRcon.Types.Response.Server;
 using RustRcon.Types.Server;
 
-namespace RustRcon.Types.Commands.Server.Player
-{
-    public class GetBanList : BaseCommand
-    {
-        private Action<List<BannedPlayer>> _callback;
+#endregion
 
+namespace RustRcon.Types.Commands.Server.Entity
+{
+    public class GetBanList : BaseCommand<PoolableList<BannedPlayer>>
+    {
         /// <summary>
-        /// Get players ban list command
+        ///     Get players ban list command
         /// </summary>
-        /// <param name="callback">A response containing a list of locks is called after receiving a response from the server</param>
-        public static GetBanList Create(Action<List<BannedPlayer>> callback)
+        public static GetBanList Create()
         {
             var command = CreatePackage<GetBanList>();
-            command._callback = callback;
             command.Content = "banlistex";
 
             return command;
@@ -29,8 +29,6 @@ namespace RustRcon.Types.Commands.Server.Player
         public override void Complete(ServerResponse response)
         {
             base.Complete(response);
-
-            List<BannedPlayer> bannedPlayers = RustRconPool.GetList<BannedPlayer>();
 
             try
             {
@@ -52,7 +50,7 @@ namespace RustRcon.Types.Commands.Server.Player
                             Reason = match.Groups[3].Value
                         };
 
-                        bannedPlayers.Add(bannedPlayer);
+                        Result.Add(bannedPlayer);
                     }
                 }
             }
@@ -60,16 +58,6 @@ namespace RustRcon.Types.Commands.Server.Player
             {
                 // ignored
             }
-
-            _callback?.Invoke(bannedPlayers);
-            RustRconPool.FreeList(bannedPlayers);
-        }
-
-        protected override void EnterPool()
-        {
-            base.EnterPool();
-
-            _callback = null;
         }
     }
 }

@@ -1,22 +1,23 @@
-﻿using Newtonsoft.Json;
+﻿#region
+
+using Newtonsoft.Json;
+using RustRcon.Pooling;
 using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Response;
-using System;
 using RustRcon.Types.Response.Server;
+
+#endregion
 
 namespace RustRcon.Types.Commands.Server
 {
-    public class GetServerInfo : BaseCommand
+    public class GetServerInfo : BaseCommand<ServerInfo>
     {
-        private Action<ServerInfo> _callback;   
-        
-        /// Return server info
+        /// <summary>
+        ///     Return server info
         /// </summary>
-        /// <param name="callback">Called when a response is received, contains an instance of the ServerInfo class</param>
-        public static GetServerInfo Create(Action<ServerInfo> callback)
+        /// <returns>ServerInfo</returns>
+        public static GetServerInfo Create()
         {
-            var command =  CreatePackage<GetServerInfo>();
-            command._callback = callback;
+            var command = CreatePackage<GetServerInfo>();
             command.Content = "serverinfo";
 
             return command;
@@ -28,21 +29,13 @@ namespace RustRcon.Types.Commands.Server
 
             try
             {
-                var serverInfo = JsonConvert.DeserializeObject<ServerInfo>(response.Content);
-
-                _callback?.Invoke(serverInfo);
+                Result = RustRconPool.Get<ServerInfo>();
+                JsonConvert.PopulateObject(response.Content, Result);
             }
             catch
             {
-                _callback?.Invoke(new ServerInfo());
+                // ignored
             }
-        }
-
-        protected override void EnterPool()
-        {
-            base.EnterPool();
-
-            _callback = null;
         }
     }
 }

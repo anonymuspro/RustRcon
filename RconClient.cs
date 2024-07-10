@@ -1,174 +1,135 @@
-﻿using Newtonsoft.Json;
-using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Response;
-using RustRcon.Types.Server.Messages;
+﻿#region
+
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using RustRcon.Pooling;
+using RustRcon.Types;
+using RustRcon.Types.Commands.Base;
 using RustRcon.Types.Response.Server;
-using WebSocketSharp;
+using RustRcon.Types.Server.Messages;
+using Services.Client;
+
+#endregion
 
 namespace RustRcon
 {
-    public class RconClient : IDisposable
+    public class RconClient : WebSocketClient
     {
-        private readonly string _host;
-        private readonly int _port;
-        private readonly string _password;
-
-        private readonly WebSocket _client;
-        private readonly Dictionary<Int32, BaseCommand> _commands;
+        private readonly Dictionary<Int32, TaskCompletionSource<ServerResponse>> _commandHandlers;
 
         /// <summary>
-        /// Called when a new console message is received from the server.
+        ///     Called when a new console message is received from the server.
         /// </summary>
-        public event Action<ConsoleMsg> OnConsoleMessage;
+        public event Action<ConsoleMsg>? OnConsoleMessage;
 
         /// <summary>
-        /// Called when a new chat message is received from the server.
+        ///     Called when a new chat message is received from the server.
         /// </summary>
-        public event Action<ChatMsg> OnChatMessage;
+        public event Action<ChatMsg>? OnChatMessage;
+
 
         /// <summary>
-        /// Called when the connection status changes.
-        /// </summary>
-        public event Action<bool> OnConnectionChanged;
-
-        public bool IsConnected => _client.IsAlive;
-
-        /// <summary>
-        /// Initialise new remote connection to a specified server.
+        ///     Initialise new remote connection to a specified server.
         /// </summary>
         /// <param name="host">IP, hostname or FQDN of the host</param>
         /// <param name="port">Query port, usualy game port + 1</param>
         /// <param name="password">RCON passphrase</param>
-        public RconClient(string host, int port, string password)
+        /// <param name="logger">WebSockets logger</param>
+        public RconClient(string host, int port, string password, ILogger? logger = null) : base(
+            new Uri($"ws://{host}:{port}/{password}"), logger)
         {
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(password) || port < 1 || port > short.MaxValue)
-                throw new ArgumentException("Not all arguments have been supplied.");
-
-            _host = host;
-            _port = port;
-            _password = password;
-
-            _client = new WebSocket($"ws://{host}:{port}/{password}");
-            _client.OnClose += OnClose;
-            _client.OnError += OnError;
-            _client.OnMessage += OnMessage;
-            _client.OnOpen += OnOpen;
-            _commands = new Dictionary<int, BaseCommand>();
+            _commandHandlers = new Dictionary<int, TaskCompletionSource<ServerResponse>>();
         }
 
-        public void Connect()
+        public override async Task ConnectAsync(CancellationToken cancellation = default)
         {
-            try
-            {
-                _client.Connect();
-            }
-            catch (Exception ex)
-            {
-                // ignored
-            }
+            await base.ConnectAsync(cancellation);
+
+            _ = Task.Run(() => HandleMessages(ConnectionCts!.Token), ConnectionCts!.Token);
         }
 
-        public void SendCommand(BaseCommand command)
+        public async Task SendCommandAsync<T>(BaseCommand<T> command,
+            CancellationToken cancellationToken = default) where T : BasePoolable, new()
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
 
-            string json = JsonConvert.SerializeObject(command);
+            await SendAsync(command, cancellationToken);
+            var readTcs = new TaskCompletionSource<ServerResponse>();
 
-            _client.Send(json);
-            _commands.Add(command.Id, command);
+            cancellationToken.Register(() =>
+            {
+                readTcs.TrySetCanceled();
+                _commandHandlers.Remove(command.Id);
+            });
+
+            _commandHandlers.Add(command.Id, readTcs);
+            var serverResponse = await readTcs.Task;
+            command.Complete(serverResponse);
         }
 
-        private void OnMessage(object sender, MessageEventArgs e)
+        private async void HandleMessages(CancellationToken cancellation)
         {
-            if (string.IsNullOrEmpty(e.Data)) return;
-
-            var response = JsonConvert.DeserializeObject<ServerResponse>(e.Data);
-            if (response == null)
-                return;
-
-            if (_commands.TryGetValue(response.Id, out BaseCommand command))
+            while (!cancellation.IsCancellationRequested)
             {
-                if (command.Completed)
+                ServerResponse? serverResponse = await ReadAsync<ServerResponse>(cancellation);
+
+                if (serverResponse == null)
+                    continue;
+
+                if (!_commandHandlers.Remove(serverResponse.Id, out TaskCompletionSource<ServerResponse> tcs))
                 {
-                    if (!command.Disposed)
-                        command.Dispose();
-                    return;
-                }
+                    ConsoleMsg? consoleMsg = null;
+                    ChatMsg? chatMsg = null;
 
-                command.Complete(response);
-                _commands.Remove(command.Id);
-
-                command.Dispose();
-                return;
-            }
-
-            try
-            {
-                if (response.Content.StartsWith("[rcon]"))
-                    return;
-
-                switch (response.Id)
-                {
-                    case 0:
+                    try
                     {
-                        OnConsoleMessage?.Invoke(new ConsoleMsg(response.Content,
-                            response.Type.ToEnum<ConsoleMsg.MessageType>()));
-                        break;
-                    }
-                    default:
-                    {
-                        if (response.Type == "Chat")
+                        if (serverResponse.Content.StartsWith("[rcon]"))
+                            continue;
+
+                        switch (serverResponse.Id)
                         {
-                            var msg = JsonConvert.DeserializeObject<ChatMsg>(response.Content);
-                            OnChatMessage?.Invoke(msg);
+                            case 0:
+                            {
+                                consoleMsg = RustRconPool.Get<ConsoleMsg>();
+                                consoleMsg.Message = serverResponse.Content;
+                                consoleMsg.Type = serverResponse.Type.ToEnum<ConsoleMsg.MessageType>();
+
+                                OnConsoleMessage?.Invoke(consoleMsg);
+                                break;
+                            }
+                            default:
+                            {
+                                if (serverResponse.Type != "Chat")
+                                    continue;
+
+                                chatMsg = RustRconPool.Get<ChatMsg>();
+                                JsonConvert.PopulateObject(serverResponse.Content, chatMsg);
+
+                                OnChatMessage?.Invoke(chatMsg);
+                                break;
+                            }
                         }
-
-                        break;
                     }
+                    catch (Exception ex)
+                    {
+                        consoleMsg?.Dispose();
+                        chatMsg?.Dispose();
+                    }
+
+                    continue;
                 }
+
+                tcs.SetResult(serverResponse);
             }
-            catch (Exception)
+
+            foreach (var (_, tcs) in _commandHandlers)
             {
-                // ignored
+                tcs.TrySetCanceled();
             }
-        }
-
-        private void OnOpen(object sender, EventArgs e)
-        {
-            OnConnectionChanged?.Invoke(true);
-        }
-
-        private void OnError(object sender, ErrorEventArgs e)
-        {
-            try
-            {
-                _client.Close();
-                OnConnectionChanged?.Invoke(false);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        private void OnClose(object sender, CloseEventArgs e)
-        {
-            OnConnectionChanged?.Invoke(false);
-        }
-
-        public void Dispose()
-        {
-            if (IsConnected)
-            {
-                _client.Close();
-            }
-
-            OnChatMessage = null;
-            OnConsoleMessage = null;
-            OnConnectionChanged = null;
         }
     }
 }

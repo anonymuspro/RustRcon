@@ -14,6 +14,5 @@
         public bool Loaded { get; private set; }
         public string Version { get; private set; }
         public string Author { get; private set; }
-
     }
 }
