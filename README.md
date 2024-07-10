@@ -44,9 +44,9 @@ PM> Install-Package RustRcon_Client
 
 Required namespace.
 
-~~~C#
+```cs
 using RustRcon;
-~~~
+```
 
 The RconClient class exists in the RustRcon namespace.
 
@@ -54,15 +54,15 @@ The RconClient class exists in the RustRcon namespace.
 
 Creating a new instance of the RconClient class with the adress, port and password.
 
-~~~C#
+```cs
 RconClient rconClient = new RconClient("localhost", 28016, "root");
-~~~
+```
 
 #### Step 3:
 
 Setting the events, example:
 
-~~~C#
+```cs
 rconClient.OnChatMessage += (e) =>
 {
     Console.WriteLine($"{e.Username}: {e.Message}");
@@ -74,25 +74,27 @@ rconClient.OnConsoleMessage += (e) =>
     Console.WriteLine($"{e.Message}");
     e.Dispose();
 };
-~~~
+```
 
 #### Step 4:
 
 Connecting to server.
 
-~~~C#
+```cs
 await rconClient.ConnectAsync();
-~~~
+```
 
 #### Step 5:
 
-Sending command to server, the commands accept in their constructor a reference to the callback action with the result
-of the request:
+When sending a command to the server, commands take the necessary arguments in their constructor, after asynchronous waiting for the result the response will be in command.ServerResponse.Content (json) and if the command has a unique response, it will be in command.Result
 
-~~~C#
+```cs
 var command = GetServerInfo.Create();
 await rconClient.SendCommandAsync(command);
 
 Console.WriteLine($"{command.Id} - {command.ServerResponse?.Id} : {command.Result?.Hostname}");
 command.Dispose();
-~~~
+```
+
+**Attention:** If the function does not have a specific return value, the `Result` will also contain `ServerResponse` <br>
+And don't forget to call `Dispose` on commands and messages after use.
