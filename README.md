@@ -3,30 +3,21 @@
 ## Features:
 
 > * _Server_
-    >
-
-- Get ServerInfo.
-
-> - Stop/Restart server.
->   - Send console command.
->   - On chat/console message events.
+> > - Get ServerInfo.
+> > - Stop/Restart server.
+> > - Send console command.
+> > - On chat/console message events.
 
 > * _Player_
-    >
-
-- Kick/Ban player.
-
-> - Get players ban list.
->   - Kill player.
->   - Get player info.
+> > - Kick/Ban player.
+> > - Get players ban list.
+> > - Kill player.
+> > - Get player info.
 
 > * _Oxide_
-    >
-
-- Get plugin list.
-
-> - Reload plugin.
->   - Load/Unload plugin.
+> > - Get plugin list.
+> > - Reload plugin.
+> >  - Load/Unload plugin.
 
 ## Install:
 
