@@ -11,8 +11,10 @@ using RustRcon.Types.Server.Messages;
 
 namespace RustRcon.Types.Commands.Server
 {
-    public class GetConsoleHistory : BaseCommand<PoolableList<ConsoleMsg>>
+    public class GetConsoleHistory : BaseCommand
     {
+        public PoolableList<ConsoleMsg>? Result { get; private set; }
+
         /// <summary>
         ///     Return server console messages history
         /// </summary>
@@ -38,6 +40,12 @@ namespace RustRcon.Types.Commands.Server
             {
                 // ignored
             }
+        }
+
+        protected override void EnterPool()
+        {
+            base.EnterPool();
+            Result?.Dispose();
         }
     }
 }

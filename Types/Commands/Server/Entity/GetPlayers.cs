@@ -11,8 +11,10 @@ using RustRcon.Types.Server;
 
 namespace RustRcon.Types.Commands.Server.Entity
 {
-    public class GetPlayers : BaseCommand<PoolableList<Player>>
+    public class GetPlayers : BaseCommand
     {
+        public PoolableList<Player>? Result { get; private set; }
+
         /// <summary>
         ///     Get players command
         /// </summary>
@@ -37,6 +39,12 @@ namespace RustRcon.Types.Commands.Server.Entity
             {
                 // ignored
             }
+        }
+
+        protected override void EnterPool()
+        {
+            base.EnterPool();
+            Result?.Dispose();
         }
     }
 }

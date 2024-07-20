@@ -1,12 +1,13 @@
 ﻿#region
 
+using System.Collections;
 using System.Collections.Generic;
 
 #endregion
 
 namespace RustRcon.Pooling
 {
-    public class PoolableList<T> : BasePoolable
+    public class PoolableList<T> : BasePoolable, IEnumerable<T>
     {
         private readonly List<T> _internalList;
 
@@ -14,6 +15,7 @@ namespace RustRcon.Pooling
         {
             _internalList = new List<T>();
         }
+
 
         public void Add(T item)
         {
@@ -25,12 +27,22 @@ namespace RustRcon.Pooling
             return _internalList.Remove(item);
         }
 
-        public int Count => _internalList.Count;
-
         public T this[int index]
         {
             get => _internalList[index];
             set => _internalList[index] = value;
+        }
+
+        public int Count => _internalList.Count;
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _internalList.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         protected override void EnterPool()

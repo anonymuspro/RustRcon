@@ -1,13 +1,12 @@
 ﻿#region
 
 using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Response.Server;
 
 #endregion
 
 namespace RustRcon.Types.Commands.Server
 {
-    public class StopServer : BaseCommand<ServerResponse>
+    public class StopServer : BaseCommand
     {
         /// <summary>
         ///     Stop game server
@@ -18,12 +17,6 @@ namespace RustRcon.Types.Commands.Server
             command.Content = "server.stop";
 
             return command;
-        }
-
-        public override void Complete(ServerResponse response)
-        {
-            base.Complete(response);
-            Result = response;
         }
     }
 }

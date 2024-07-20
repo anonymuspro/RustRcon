@@ -13,8 +13,10 @@ using RustRcon.Types.Server;
 
 namespace RustRcon.Types.Commands.Server.Entity
 {
-    public class GetBanList : BaseCommand<PoolableList<BannedPlayer>>
+    public class GetBanList : BaseCommand
     {
+        public PoolableList<BannedPlayer>? Result { get; private set; }
+        
         /// <summary>
         ///     Get players ban list command
         /// </summary>
@@ -32,32 +34,39 @@ namespace RustRcon.Types.Commands.Server.Entity
 
             try
             {
-                if (string.IsNullOrEmpty(response.Content) == false)
+                if (string.IsNullOrEmpty(response.Content))
+                    return;
+
+                Result = RustRconPool.Get<PoolableList<BannedPlayer>>();
+                List<string> rows = response.Content.Split('\n').ToList();
+
+                foreach (var row in rows)
                 {
-                    List<string> rows = response.Content.Split('\n').ToList();
+                    Match match = Regex.Match(row, "[0-9]+\\s([0-9]+)\\s\"(.*?)\"\\s\"(.*?)\"\\s(.*)");
 
-                    foreach (var row in rows)
+                    if (!match.Success)
+                        continue;
+
+                    var bannedPlayer = new BannedPlayer()
                     {
-                        Match match = Regex.Match(row, "[0-9]+\\s([0-9]+)\\s\"(.*?)\"\\s\"(.*?)\"\\s(.*)");
+                        SteamID = match.Groups[1].Value,
+                        DisplayName = match.Groups[2].Value,
+                        Reason = match.Groups[3].Value
+                    };
 
-                        if (!match.Success)
-                            continue;
-
-                        var bannedPlayer = new BannedPlayer()
-                        {
-                            SteamID = match.Groups[1].Value,
-                            DisplayName = match.Groups[2].Value,
-                            Reason = match.Groups[3].Value
-                        };
-
-                        Result.Add(bannedPlayer);
-                    }
+                    Result.Add(bannedPlayer);
                 }
             }
             catch (Exception)
             {
                 // ignored
             }
+        }
+
+        protected override void EnterPool()
+        {
+            base.EnterPool();
+            Result?.Dispose();
         }
     }
 }

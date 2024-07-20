@@ -1,16 +1,13 @@
 ﻿#region
 
-using RustRcon.Pooling;
 using RustRcon.Types.Response.Server;
 
 #endregion
 
 namespace RustRcon.Types.Commands.Base
 {
-    public abstract class BaseCommand<T> : BasePackage where T : BasePoolable, new()
+    public abstract class BaseCommand : BasePackage
     {
-        public T? Result { get; protected set; }
-
         public ServerResponse? ServerResponse { get; protected set; }
 
         /// <summary>
@@ -40,7 +37,6 @@ namespace RustRcon.Types.Commands.Base
             base.EnterPool();
 
             ServerResponse?.Dispose();
-            Result?.Dispose();
             Completed = false;
         }
     }

@@ -7,7 +7,7 @@ using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server.Entity
 {
-    public class KickPlayer : BaseCommand<ServerResponse>
+    public class KickPlayer : BaseCommand
     {
         /// <summary>
         ///     Kick player from server
@@ -20,12 +20,6 @@ namespace RustRcon.Types.Commands.Server.Entity
             command.Content = $"kick {steamId} {reason}";
 
             return command;
-        }
-
-        public override void Complete(ServerResponse response)
-        {
-            base.Complete(response);
-            Result = response;
         }
     }
 }

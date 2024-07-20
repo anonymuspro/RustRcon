@@ -9,8 +9,10 @@ using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server
 {
-    public class GetServerInfo : BaseCommand<ServerInfo>
+    public class GetServerInfo : BaseCommand
     {
+        public ServerInfo? Result { get; private set; }
+        
         /// <summary>
         ///     Return server info
         /// </summary>
@@ -36,6 +38,12 @@ namespace RustRcon.Types.Commands.Server
             {
                 // ignored
             }
+        }
+
+        protected override void EnterPool()
+        {
+            base.EnterPool();
+            Result?.Dispose();
         }
     }
 }

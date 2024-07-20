@@ -51,8 +51,7 @@ namespace RustRcon
             _ = Task.Run(() => HandleMessages(ConnectionCts!.Token), ConnectionCts!.Token);
         }
 
-        public async Task SendCommandAsync<T>(BaseCommand<T> command,
-            CancellationToken cancellationToken = default) where T : BasePoolable, new()
+        public async Task SendCommandAsync(BaseCommand command, CancellationToken cancellationToken = default)
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
@@ -80,7 +79,7 @@ namespace RustRcon
                 if (serverResponse == null)
                     continue;
 
-                if (!_commandHandlers.Remove(serverResponse.Id, out TaskCompletionSource<ServerResponse> tcs))
+                if (!_commandHandlers.Remove(serverResponse.Id, out TaskCompletionSource<ServerResponse>? tcs))
                 {
                     ConsoleMsg? consoleMsg = null;
                     ChatMsg? chatMsg = null;
@@ -114,7 +113,7 @@ namespace RustRcon
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         consoleMsg?.Dispose();
                         chatMsg?.Dispose();

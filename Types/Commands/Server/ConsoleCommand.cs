@@ -7,7 +7,7 @@ using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server
 {
-    public class ConsoleCommand : BaseCommand<ServerResponse>
+    public class ConsoleCommand : BaseCommand
     {
         /// <summary>
         ///     Run command on the server console
@@ -20,12 +20,6 @@ namespace RustRcon.Types.Commands.Server
             command.Content = message;
 
             return command;
-        }
-
-        public override void Complete(ServerResponse response)
-        {
-            base.Complete(response);
-            Result = response;
         }
     }
 }

@@ -96,5 +96,4 @@ Console.WriteLine($"{command.Id} - {command.ServerResponse?.Id} : {command.Resul
 command.Dispose();
 ```
 
-**Attention:** If the function does not have a specific return value, the `Result` will also contain `ServerResponse` <br>
-And don't forget to call `Dispose` on commands and messages after use.
+**Attention:** don't forget to call `Dispose` on commands and messages after use.

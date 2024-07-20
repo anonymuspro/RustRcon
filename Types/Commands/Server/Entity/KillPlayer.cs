@@ -7,7 +7,7 @@ using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server.Entity
 {
-    public class KillPlayer : BaseCommand<ServerResponse>
+    public class KillPlayer : BaseCommand
     {
         /// <summary>
         ///     Kill player character
@@ -19,12 +19,6 @@ namespace RustRcon.Types.Commands.Server.Entity
             command.Content = $"killplayer {steamId}";
 
             return command;
-        }
-
-        public override void Complete(ServerResponse response)
-        {
-            base.Complete(response);
-            Result = response;
         }
     }
 }

@@ -7,7 +7,7 @@ using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Server.Entity
 {
-    public class BanPlayer : BaseCommand<ServerResponse>
+    public class BanPlayer : BaseCommand
     {
         /// <summary>
         ///     Blocks a player on the server
@@ -20,12 +20,6 @@ namespace RustRcon.Types.Commands.Server.Entity
             command.Content = $"ban {steamId} {reason}";
 
             return command;
-        }
-
-        public override void Complete(ServerResponse response)
-        {
-            base.Complete(response);
-            Result = response;
         }
     }
 }

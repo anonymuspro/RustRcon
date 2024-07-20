@@ -1,13 +1,12 @@
 ﻿#region
 
 using RustRcon.Types.Commands.Base;
-using RustRcon.Types.Response.Server;
 
 #endregion
 
 namespace RustRcon.Types.Commands.Oxide
 {
-    public class UnloadPlugin : BaseCommand<ServerResponse>
+    public class UnloadPlugin : BaseCommand
     {
         public static UnloadPlugin Create(string pluginName)
         {
@@ -15,12 +14,6 @@ namespace RustRcon.Types.Commands.Oxide
             command.Content = $"o.load {pluginName}";
 
             return command;
-        }
-
-        public override void Complete(ServerResponse response)
-        {
-            base.Complete(response);
-            Result = response;
         }
     }
 }
