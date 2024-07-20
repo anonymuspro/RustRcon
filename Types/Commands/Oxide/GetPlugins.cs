@@ -13,8 +13,10 @@ using RustRcon.Types.Response.Server;
 
 namespace RustRcon.Types.Commands.Oxide
 {
-    public class GetPlugins : BaseCommand<PoolableList<Plugin>>
+    public class GetPlugins : BaseCommand
     {
+        public PoolableList<Plugin>? Result { get; private set; }
+
         /// <summary>
         ///     Returns a list of installed plugins (if there is an oxide mod)
         /// </summary>
@@ -35,43 +37,51 @@ namespace RustRcon.Types.Commands.Oxide
 
             try
             {
-                List<string> plugins = response.Content.Split('\n').ToList();
+                Result = RustRconPool.Get<PoolableList<Plugin>>();
+                var lines = response.Content.AsSpan().Trim().Split("\n");
+                var linesEnumerator = lines.GetEnumerator();
+                linesEnumerator.MoveNext();
 
-                foreach (var plugin in plugins.Skip(1))
+                while (linesEnumerator.MoveNext())
                 {
-                    string name;
-                    bool loaded;
-                    string version = "";
-                    string author = "";
+                    var lineSpan = linesEnumerator.Current.AsSpan().Trim();
 
-                    Match m1 = Regex.Match(plugin,
-                        "[0-9]+\\s\"(.*)\"\\s\\(([0-9]+.[0-9]+.[0-9]+)\\)\\sby\\s(.*?)\\s\\((.*?)\\)\\s-\\s(.*)");
+                    int titleStart = lineSpan.IndexOf('"') + 1;
+                    int titleEnd = lineSpan.Slice(titleStart).IndexOf('"') + titleStart;
+                    var title = lineSpan.Slice(titleStart, titleEnd - titleStart).ToString();
 
-                    if (m1.Success == false)
-                    {
-                        m1 = Regex.Match(plugin, "[0-9]+\\s(.*)\\s-\\sUnloaded");
+                    int versionStart = lineSpan.Slice(titleEnd).IndexOf('(') + titleEnd + 1;
+                    int versionEnd = lineSpan.Slice(versionStart).IndexOf(')') + versionStart;
+                    var version = lineSpan.Slice(versionStart, versionEnd - versionStart).ToString();
 
-                        if (m1.Success == false)
-                            continue;
+                    int authorStart = lineSpan.Slice(versionEnd).IndexOf("by ") + versionEnd + 3;
+                    int authorEnd = lineSpan.Slice(authorStart).IndexOf('(') + authorStart - 1;
+                    var author = lineSpan.Slice(authorStart, authorEnd - authorStart).Trim().ToString();
 
-                        name = m1.Groups[1].Value;
-                        loaded = false;
-                    }
-                    else
-                    {
-                        name = m1.Groups[1].Value;
-                        loaded = true;
-                        version = m1.Groups[2].Value;
-                        author = m1.Groups[3].Value;
-                    }
+                    int timeStart = lineSpan.Slice(authorEnd).IndexOf('(') + authorEnd + 1;
+                    int timeEnd = lineSpan.Slice(timeStart).IndexOf('s') + timeStart + 1;
+                    var time = lineSpan.Slice(timeStart, timeEnd - timeStart).ToString();
 
-                    Result.Add(new Plugin(name, loaded, version, author));
+                    int memoryStart = lineSpan.Slice(timeEnd).IndexOf('/') + timeEnd + 2;
+                    int memoryEnd = lineSpan.Slice(memoryStart).IndexOf(' ') + memoryStart + 1;
+                    var memory = lineSpan.Slice(memoryStart, memoryEnd - memoryStart).Trim().ToString();
+
+                    int filenameStart = lineSpan.Slice(memoryEnd).IndexOf("- ") + memoryEnd + 2;
+                    var filename = lineSpan.Slice(filenameStart).ToString().Trim();
+
+                    Result.Add(new Plugin(filename, title, version, author, time, memory));
                 }
             }
             catch (Exception)
             {
                 // ignored
             }
+        }
+
+        protected override void EnterPool()
+        {
+            base.EnterPool();
+            Result?.Dispose();
         }
     }
 }
